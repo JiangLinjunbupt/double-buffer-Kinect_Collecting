@@ -22,15 +22,13 @@ struct PointCloud
 	void DepthMatToPointCloud(cv::Mat& depth, HandFinder* hanfinder)
 	{
 		pointcloud_vector.clear();
-		Mat depth_clone = depth.clone();
-		GaussianBlur(depth_clone, depth_clone, Size(9, 9), 0.85, 0.85);
 
 		for (int i = 0; i < hanfinder->num_sensor_points; i++)
 		{
 			int col = hanfinder->sensor_indicator[i] % 512;        //x
 			int row = hanfinder->sensor_indicator[i] / 512;        //y
 
-			Integer z = depth_clone.at<unsigned short>(row, col);
+			Integer z = depth.at<unsigned short>(row, col);
 
 			Vector3 p_pixel = camera->depth_to_world(row, col, z);
 

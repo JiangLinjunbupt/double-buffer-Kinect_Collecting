@@ -60,7 +60,7 @@ void HandFinder::binary_classification(cv::Mat& depth, cv::Mat& color) {
 		minMaxIdx(depth_copy, &minValue, &maxValue);
 
 		float threshold = 120;//单位mm
-		cv::inRange(depth, minValue, minValue + threshold /*mm*/, /*=*/ in_z_range);
+		cv::inRange(depth, minValue-10, minValue + threshold /*mm*/, /*=*/ in_z_range);//这里minValue-10是因为实践中发现直接用minValue，点云会出现空洞，因此考虑把下限减小一些。
 
 		cv::bitwise_and(mask_wristband, in_z_range, mask_wristband);
 
@@ -138,7 +138,7 @@ void HandFinder::binary_classification(cv::Mat& depth, cv::Mat& color) {
 			sensor_hand_silhouette = (labels == to_sort[1]);
 		}
 
-		GaussianBlur(sensor_hand_silhouette, sensor_hand_silhouette, Size(5, 5), 0.85, 0.85);
+		GaussianBlur(sensor_hand_silhouette, sensor_hand_silhouette, Size(3, 3), 1, 1);
 
 		if (_settings.show_hand) {
 			cv::imshow("show_hand", sensor_hand_silhouette);
