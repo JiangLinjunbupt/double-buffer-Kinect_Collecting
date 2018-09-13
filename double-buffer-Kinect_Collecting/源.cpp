@@ -96,7 +96,7 @@ void draw() {
 		glPointSize(2);
 		glBegin(GL_POINTS);
 		glColor3d(0.0, 1.0, 0.0);
-		cout << "the pointcloud size : " << pointcloud.pointcloud_vector.size() << endl;
+		//cout << "the pointcloud size : " << pointcloud.pointcloud_vector.size() << endl;
 		for (int i = 0; i < pointcloud.pointcloud_vector.size(); i++)
 		{
 			glVertex3f(pointcloud.pointcloud_vector[i].x(), pointcloud.pointcloud_vector[i].y(), pointcloud.pointcloud_vector[i].z());
@@ -119,14 +119,16 @@ void mouseMotion(int x, int y) {
 
 void idle() {
 	start = clock();
-	mykinect.fetch_data(dataframe, handfinder);
+	mykinect.fetch_data(dataframe, handfinder,pointcloud);
 
-	pointcloud.DepthMatToPointCloud(dataframe.depth, &handfinder);
+	//pointcloud.DepthMatToPointCloud(dataframe.depth, &handfinder);
 
 
 	/*cv::imshow("color_show", dataframe.color);
 	cv::imshow("depth_show", handfinder.sensor_hand_silhouette);
 	cv::waitKey(1);*/
+
+	//cv::imshow("depth_show", handfinder.sensor_hand_silhouette);
 
 	ends_clock = clock();
 	cout << "Running Time : " << (double)(ends_clock - start) / CLOCKS_PER_SEC << endl;

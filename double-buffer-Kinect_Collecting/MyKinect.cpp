@@ -27,6 +27,9 @@ myKinect::myKinect(Camera *_camera) :
 	myMapper(NULL)
 {
 	this->handfinder = new HandFinder(_camera);
+	this->pointcloud = new PointCloud();
+	this->pointcloud->camera = _camera;
+
 
 	int cDepthHeight = camera->height();
 	int cDepthWidth = camera->width();
@@ -37,8 +40,8 @@ myKinect::myKinect(Camera *_camera) :
 	color_image[FRONT_BUFFER] = Mat(cDepthHeight, cDepthWidth, CV_8UC3, cv::Scalar(0, 0, 0));
 	color_image[BACK_BUFFER] = Mat(cDepthHeight, cDepthWidth, CV_8UC3, cv::Scalar(0, 0, 0));
 
-	sensor_indicator_array[FRONT_BUFFER] = std::vector<int>(cDepthHeight*cDepthWidth, 0);
-	sensor_indicator_array[BACK_BUFFER] = std::vector<int>(cDepthHeight*cDepthWidth, 0);
+	pointcloud_vector[FRONT_BUFFER].clear();
+	pointcloud_vector[BACK_BUFFER].clear();
 
 	sensor_silhouette_buffer = Mat::zeros(cDepthHeight, cDepthWidth, CV_8UC1);
 
@@ -119,24 +122,24 @@ HRESULT myKinect::InitializeDefaultSensor()
 
 }
 
-void myKinect::fetch_data(DataFrame &frame, HandFinder & other_handfinder)
+void myKinect::fetch_data(DataFrame &frame, HandFinder & other_handfinder,PointCloud &other_pointcloud)
 {
 	std::unique_lock<std::mutex> lock(swap_mutex);
 	condition.wait(lock, [] {return thread_released; });
 	main_released = false;
 
-
-	frame.color = color_image[FRONT_BUFFER].clone();
+	//frame.color = color_image[FRONT_BUFFER].clone();
 	frame.depth = depth_image[FRONT_BUFFER].clone();
 
 	other_handfinder.sensor_hand_silhouette = sensor_silhouette_buffer.clone();
 	other_handfinder._wristband_found = wristband_found_buffer;
 
-	other_handfinder.num_sensor_points = num_sensor_points_array[FRONT_BUFFER];
+	//other_pointcloud.pointcloud_vector.swap(pointcloud_vector[FRONT_BUFFER]);
+	other_pointcloud.pointcloud_vector.assign(pointcloud_vector[FRONT_BUFFER].begin(), pointcloud_vector[FRONT_BUFFER].end());
 
-	std::copy(sensor_indicator_array[FRONT_BUFFER].begin(),
-		sensor_indicator_array[FRONT_BUFFER].begin() + num_sensor_points_array[FRONT_BUFFER],
-		other_handfinder.sensor_indicator);
+	other_pointcloud.PointCloud_center_x = pointcloud_center[FRONT_BUFFER].x();
+	other_pointcloud.PointCloud_center_y = pointcloud_center[FRONT_BUFFER].y();
+	other_pointcloud.PointCloud_center_z = pointcloud_center[FRONT_BUFFER].z();
 
 	main_released = true;
 	lock.unlock();
@@ -200,20 +203,30 @@ bool myKinect::run()
 		SafeRelease(mycolorFrame);
 
 		handfinder->binary_classification(depth_image[BACK_BUFFER], color_image[BACK_BUFFER]);
-		num_sensor_points_array[BACK_BUFFER] = 0;
+		handfinder->num_sensor_points = 0;
+
 		int count = 0;
 		for (int row = 0; row < handfinder->sensor_hand_silhouette.rows; ++row) {
 			for (int col = 0; col < handfinder->sensor_hand_silhouette.cols; ++col) {
 				if (handfinder->sensor_hand_silhouette.at<uchar>(row, col) != 255) continue;
 				if (count % 2 == 0) {
-					sensor_indicator_array[BACK_BUFFER][num_sensor_points_array[BACK_BUFFER]] = row * handfinder->sensor_hand_silhouette.cols + col;
-					num_sensor_points_array[BACK_BUFFER]++;
+					handfinder->sensor_indicator[handfinder->num_sensor_points] = row * handfinder->sensor_hand_silhouette.cols + col;
+					handfinder->num_sensor_points++;
 				}
 				count++;
 			}
 		}
 
+
+
 		//cout << "handfinder done!" << endl;
+
+		pointcloud->DepthMatToPointCloud(depth_image[BACK_BUFFER], handfinder);
+
+
+		pointcloud_vector[BACK_BUFFER].swap(pointcloud->pointcloud_vector);
+		pointcloud_center[BACK_BUFFER] << pointcloud->PointCloud_center_x, pointcloud->PointCloud_center_y, pointcloud->PointCloud_center_z;
+
 
 		// Lock the mutex and swap the buffers
 		{
@@ -222,15 +235,14 @@ bool myKinect::run()
 			thread_released = false;
 
 			depth_image[FRONT_BUFFER] = depth_image[BACK_BUFFER].clone();
-			color_image[FRONT_BUFFER] = color_image[BACK_BUFFER].clone();
+			//color_image[FRONT_BUFFER] = color_image[BACK_BUFFER].clone();
 
 
 			sensor_silhouette_buffer = handfinder->sensor_hand_silhouette.clone();
 			wristband_found_buffer = handfinder->_wristband_found;
 
-			std::copy(sensor_indicator_array[BACK_BUFFER].begin(),
-				sensor_indicator_array[BACK_BUFFER].begin() + num_sensor_points_array[BACK_BUFFER], sensor_indicator_array[FRONT_BUFFER].begin());
-			num_sensor_points_array[FRONT_BUFFER] = num_sensor_points_array[BACK_BUFFER];
+			pointcloud_vector[FRONT_BUFFER].swap(pointcloud_vector[BACK_BUFFER]);
+			pointcloud_center[FRONT_BUFFER] << pointcloud_center[BACK_BUFFER];
 
 			thread_released = true;
 			lock.unlock();

@@ -1,4 +1,4 @@
-﻿  源.cpp
+﻿  MyKinect.cpp
 F:\opencv3.2\opencv\build\include\opencv2/core/mat.hpp(2586): warning C4819: 该文件包含不能在当前代码页(936)中表示的字符。请将该文件保存为 Unicode 格式以防止数据丢失
 F:\opencv3.2\opencv\build\include\opencv2/core/persistence.hpp : warning C4819: 该文件包含不能在当前代码页(936)中表示的字符。请将该文件保存为 Unicode 格式以防止数据丢失
 F:\opencv3.2\opencv\build\include\opencv2/core/utility.hpp : warning C4819: 该文件包含不能在当前代码页(936)中表示的字符。请将该文件保存为 Unicode 格式以防止数据丢失
@@ -7,15 +7,12 @@ f:\double-buffer-kinect_collecting\double-buffer-kinect_collecting\DataFrame.h(1
 f:\double-buffer-kinect_collecting\double-buffer-kinect_collecting\DataFrame.h(20): warning C4244: “参数”: 从“Integer”转换到“float”，可能丢失数据
 f:\double-buffer-kinect_collecting\double-buffer-kinect_collecting\DataFrame.h(20): warning C4244: “参数”: 从“int”转换到“float”，可能丢失数据
 F:\opencv3.2\opencv\build\include\opencv2/imgproc.hpp(592): warning C4819: 该文件包含不能在当前代码页(936)中表示的字符。请将该文件保存为 Unicode 格式以防止数据丢失
-f:\double-buffer-kinect_collecting\double-buffer-kinect_collecting\PointCloud.h(33): warning C4244: “参数”: 从“Integer”转换到“float”，可能丢失数据
-f:\double-buffer-kinect_collecting\double-buffer-kinect_collecting\PointCloud.h(33): warning C4244: “参数”: 从“int”转换到“float”，可能丢失数据
-源.cpp(100): warning C4018: “<”: 有符号/无符号不匹配
-源.cpp(115): warning C4244: “=”: 从“double”转换到“GLfloat”，可能丢失数据
-源.cpp(116): warning C4244: “=”: 从“double”转换到“GLfloat”，可能丢失数据
+f:\double-buffer-kinect_collecting\double-buffer-kinect_collecting\PointCloud.h(35): warning C4244: “参数”: 从“Integer”转换到“float”，可能丢失数据
+f:\double-buffer-kinect_collecting\double-buffer-kinect_collecting\PointCloud.h(35): warning C4244: “参数”: 从“int”转换到“float”，可能丢失数据
   正在生成代码
-  3 of 780 functions ( 0.4%) were compiled, the rest were copied from previous compilation.
-    0 functions were new in current compilation
-    0 functions had inline decision re-evaluated but remain unchanged
+  48 of 830 functions ( 5.8%) were compiled, the rest were copied from previous compilation.
+    19 functions were new in current compilation
+    23 functions had inline decision re-evaluated but remain unchanged
   已完成代码的生成
   double-buffer-Kinect_Collecting.vcxproj -> F:\double-buffer-Kinect_Collecting\Release\double-buffer-Kinect_Collecting.exe
   double-buffer-Kinect_Collecting.vcxproj -> F:\double-buffer-Kinect_Collecting\Release\double-buffer-Kinect_Collecting.pdb (Full PDB)
