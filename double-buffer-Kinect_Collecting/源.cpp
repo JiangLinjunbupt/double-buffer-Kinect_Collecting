@@ -119,16 +119,12 @@ void mouseMotion(int x, int y) {
 
 void idle() {
 	start = clock();
+
+
 	mykinect.fetch_data(dataframe, handfinder,pointcloud);
 
-	//pointcloud.DepthMatToPointCloud(dataframe.depth, &handfinder);
-
-
-	/*cv::imshow("color_show", dataframe.color);
 	cv::imshow("depth_show", handfinder.sensor_hand_silhouette);
-	cv::waitKey(1);*/
-
-	//cv::imshow("depth_show", handfinder.sensor_hand_silhouette);
+	cv::waitKey(1);
 
 	ends_clock = clock();
 	cout << "Running Time : " << (double)(ends_clock - start) / CLOCKS_PER_SEC << endl;
@@ -161,6 +157,10 @@ int main(int argc, char** argv)
 		return -1;
 	}
 
+	//for (;;)
+	//{
+	//	mykinect.getData();
+	//}
 	glutInit(&argc, argv);
 
 	glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH);

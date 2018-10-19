@@ -49,4 +49,35 @@ struct PointCloud
 		}
 	}
 
+	void DepthMatToPointCloud(cv::Mat& depth, int *indicator,int NUM_indicator)
+	{
+		pointcloud_vector.clear();
+
+		for (int i = 0; i < NUM_indicator; i++)
+		{
+			int index = indicator[i];
+			int col = index % 512;        //x
+			int row = index / 512;        //y
+
+			Integer z = depth.at<unsigned short>(row, col);
+
+			Vector3 p_pixel = camera->depth_to_world(row, col, z);
+
+			p_pixel.z() = p_pixel.z();    //这里加负号的原因：我设置的虚拟摄像机是看向Z轴负方向，而现实中的摄像机是看向Z轴正方向的
+			this->PointCloud_center_x += p_pixel.x();
+			this->PointCloud_center_y += p_pixel.y();
+			this->PointCloud_center_z += p_pixel.z();
+
+			this->pointcloud_vector.push_back(p_pixel);
+
+		}
+
+		if (this->pointcloud_vector.size() != 0)
+		{
+			this->PointCloud_center_x = this->PointCloud_center_x / (float)(this->pointcloud_vector.size());
+			this->PointCloud_center_y = this->PointCloud_center_y / (float)(this->pointcloud_vector.size());
+			this->PointCloud_center_z = this->PointCloud_center_z / (float)(this->pointcloud_vector.size());
+		}
+	}
+
 };
